@@ -763,19 +763,9 @@ window-system
 		  )))
 
 ;; untabify on save
-;; 20130120 copied from http://www.jwz.org/doc/tabs-vs-spaces.html
-;;
-(defun java-mode-untabify ()
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward "[ \t]+$" nil t)
-        (delete-region (match-beginning 0) (match-end 0)))
-      (goto-char (point-min))
-      (if (search-forward "\t" nil t)
-          (untabify (1- (point)) (point-max))))
-    nil)
+(setq-default indent-tabs-mode nil)
+ ;; if indent-tabs-mode is off, untabify before saving
+ (add-hook 'write-file-hooks 
+          (lambda () (if (not indent-tabs-mode)
+                         (untabify (point-min) (point-max)))))
 
-  (add-hook 'javascript-mode-hook 
-            '(lambda ()
-               (make-local-variable 'write-contents-hooks)
-               (add-hook 'write-contents-hooks 'java-mode-untabify)))
