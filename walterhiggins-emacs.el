@@ -12,19 +12,13 @@
 ; Always end a file with a newline
 (setq require-final-newline t)
 
-;; ; Enable wheelmouse support by default
-;; (cond (window-system
-;; 		 ;(setq w32-use-w32-font-dialog nil)
-;; 		 ;(setq w32-fixed-font-alist
-;; ;				 (append w32-fixed-font-alist 
-;; ;							'(("Walters"
-;; ;								("tiny" "-outline-ProggyTinyTT-normal-r-normal-normal-16-120-96-96-c-*-iso10646-1")
-;; ;								("large" "-outline-Bitstream Vera Sans Mono-normal-r-normal-normal-12-90-96-96-c-*-iso10646-1"))))
-;; ;				 )
-;;        (mwheel-install)
-;;        ))
 
-; frame title : set to buffer name
+; Enable wheelmouse support by default
+(cond (window-system
+	  (mwheel-install)
+	  ))
+
+; frame	 title : set to buffer name
 ;(setq frame-title-format "Emacs - %f ")  
 (setq frame-title-format "%f")
 (setq icon-title-format  "%b")
@@ -37,7 +31,6 @@
 
 ; highlight words during query replacement
 (setq query-replace-highlight t)
-window-system
 ; highlight matches during search
 (setq search-highlight t)
 
@@ -61,14 +54,24 @@ window-system
   (interactive)
   (insert buffer-file-name)
   )
-(global-set-key "\C-c\C-f" 'wph-insert-filename)
+(defun wph-here()
+  "Insert the filename and line number at point"
+  (interactive)
+  (insert buffer-file-name)
+  (insert ":")
+  (insert (number-to-string (count-lines (point-min) (point))))
+)
+  
+(global-set-key "\C-c\C-f" 'wph-here)
 
 ; Useful key strokes
 (global-set-key "\C-c\C-g" 'goto-line)
 
-;
+					;
 (setq special-display-buffer-names '("*Shell Command Output*"))
 
+; Load Path setup
+(add-to-list 'load-path (expand-file-name "~/dot-emacs"))
 ;
 ; margin-mode is my own 1st minor mode 
 ;
@@ -78,14 +81,6 @@ window-system
 (load-library "font-lock")
 (global-font-lock-mode 1)
 
-; if I want to permanently change the font used by Win2K...
-; sometimes the ISO page number will be incorrect ,
-; use iso8859
-;(if (eq window-system 'w32)
-;    (defun insert-x-style-font()
-;      "Insert a string in X format which describes font"
-;      (interactive)
-;      (insert (prin1-to-string (w32-select-font)))))
 
 ; standard hooks
 (add-hook 'text-mode-hook 'auto-fill-mode)
@@ -103,8 +98,14 @@ window-system
          (c-toggle-auto-hungry-state 1)
          (setq indent-tabs-mode nil)
          (message (concat "java-mode-hook called for: " (buffer-name)))
-         ;;(add-hook 'post-command-hook 'jsp-movement-hook)
+         ;;(add-hook 'post-command-hook 'movement-hook)
          ))
+
+;; wph 20131125 set indent level to 2 
+(setq javascript-mode-hook
+		'(lambda ()
+			(setq js-indent-level 2)
+))
 ;
 ; bp or bean-property
 ;
@@ -183,11 +184,11 @@ window-system
 ; custom variables
 ;
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(abbrev-mode t)
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(abbrev-mode t t)
  '(ange-ftp-netrc-default-user "walter")
  '(archive-tmpdir "c:/scratch/")
  '(archive-zip-extract (quote ("perl" "c:/home/bin/unzip.pl")))
@@ -196,18 +197,27 @@ window-system
  '(column-number-mode t)
  '(cperl-indent-level 4)
  '(cperl-invalid-face (quote default) t)
+ '(flymake-jslint-command "C:/Users/walter/AppData/Roaming/dot-emacs/jslint.bat")
  '(font-lock-maximum-decoration (quote ((t . t) (t . t))))
-;; '(ftp-program "c:\\cygwin\\bin\\ftp.exe")
+ '(ftp-program "c:\\cygwin\\bin\\ftp.exe")
  '(ftp-program-options nil)
  '(global-font-lock-mode t nil (font-lock))
+ '(indent-tabs-mode nil)
+ '(js2-basic-offset 2)
+ '(js2-bounce-indent-p t)
+ '(line-number-mode 1)
  '(mail-user-agent (quote sendmail-user-agent))
- '(org-agenda-files (quote ("c:/home/scratch/work.org")))
+ '(org-agenda-files (quote ("c:/home/scratch/work.org" "c:/home/scratch/tax.org")))
  '(org-log-done (quote time))
-;; '(shell-file-name "C:\\cygwin\\bin\\sh.exe")
+ '(rcirc-default-nick "walterhiggins")
+ '(rcirc-server-alist (quote (("platdev.sfolab.ibm.com" :channels ("#webconsole")))))
+ '(shell-file-name "C:\\cygwin\\bin\\sh.exe")
  '(tab-width 3)
  '(tool-bar-mode nil)
  '(user-full-name "Walter Higgins")
- )
+ '(user-mail-address "walterh4@ie.ibm.com")
+ '(vc-handled-backends (quote (P4 Git)))
+ '(vc-p4-require-p4config t))
 
 ; abbreviations
 ;(read-abbrev-file "~/_abbrev_defs")
@@ -219,14 +229,14 @@ window-system
 (setq w32-enable-italics t)    
 ;
 ; maximise the window
-; (windows only)
-;(w32-send-sys-command 61488)
+;
+(w32-send-sys-command 61488)
 
 (defun slideshow-mode()
   ""
   (interactive "")
-  (set-face-foreground 'modeline "#303030")
-  (set-face-background 'modeline "#303030")
+  ;(set-face-foreground 'modeline "#303030")
+  ;(set-face-background 'modeline "#303030")
   (custom-set-faces
    '(cursor    ((t (:background "#304040" :foreground "green"))))
 	)
@@ -246,8 +256,8 @@ window-system
           ))
   (set-cursor-color "yellow")
   (set-mouse-color "yellow")
-  (set-face-foreground 'modeline "white")
-  (set-face-background 'modeline "#2a9400")
+  ;(set-face-foreground 'modeline "white")
+  ;(set-face-background 'modeline "#2a9400")
   (set-face-background 'region "#2a9400")
   (set-face-background 'highlight "#2a9400")
   (custom-set-faces
@@ -255,7 +265,7 @@ window-system
    '(cursor    ((t (:background "#36d003" :foreground "#141414"))))
    '(highlight ((t (:background "#2a9400" :foreground "#38d000"))))
    '(region    ((t (:background "#2a9400"     :foreground "#40d800"))))
-   '(modeline ((t (:foreground "white" :background "#2a9400" ))))
+   ;'(modeline ((t (:foreground "white" :background "#2a9400" ))))
    '(font-lock-builtin-face ((t (:foreground "#48d800"))))
 ;   '(margin-face ((t (:background "lightgray"))))
    '(font-lock-comment-face ((t (:foreground "forest green"))))
@@ -283,8 +293,8 @@ window-system
           ))
   (set-cursor-color "slateblue")
   (set-mouse-color "slateblue")
-  (set-face-foreground 'modeline "black")
-  (set-face-background 'modeline "mistyRose")
+  ;(set-face-foreground 'modeline "black")
+  ;(set-face-background 'modeline "mistyRose")
   (set-face-background 'region "lavender")
   (set-face-background 'highlight "mistyRose")
   (custom-set-faces
@@ -292,11 +302,11 @@ window-system
    '(cursor    ((t (:background "slateblue" :foreground "black"))))
    '(highlight ((t (:background "mistyRose" :foreground "black"))))
    '(region    ((t (:background "lavender"     :foreground "black"))))
-   '(modeline ((t (:foreground "navy" 
-                               :background "mistyRose" 
-                               :box (:line-width 1 
-                                                 :color "grey75" 
-                                                 :style released-button)))))
+   ;'(modeline ((t (:foreground "navy" 
+   ;                            :background "mistyRose" 
+   ;                            :box (:line-width 1 
+   ;                                              :color "grey75" 
+   ;                                              :style released-button)))))
    '(font-lock-builtin-face ((t (:foreground "blue"))))
 ;   '(margin-face ((t (:background "lightgray"))))
    '(font-lock-comment-face ((t (:foreground "navy"))))
@@ -320,8 +330,8 @@ window-system
           ))
   (set-cursor-color "#7eff00")
   (set-mouse-color "#7eff00")
-  (set-face-foreground 'modeline "#101010")
-  (set-face-background 'modeline "seagreen")   
+  ;(set-face-foreground 'modeline "#101010")
+  ;(set-face-background 'modeline "seagreen")   
   (set-face-background 'region "#7eff00")
   (set-face-background 'highlight "#7eff00")
   (custom-set-faces
@@ -329,7 +339,7 @@ window-system
    '(cursor    ((t (:background "yellow" :foreground "green1"))))
    '(highlight ((t (:background "yellow" :foreground "black"))))
    '(region    ((t (:background "yellow"     :foreground "black")))) 
-   '(modeline ((t (:background "palegreen4" :foreground "yellow"  :weight bold))))
+   ;'(modeline ((t (:background "palegreen4" :foreground "yellow"  :weight bold))))
    '(font-lock-builtin-face ((t (:foreground "darkseagreen"))))
    '(font-lock-comment-face ((t (:italic t :foreground "yellow" ))))
    '(font-lock-constant-face ((t (:bold t :foreground "palegreen"))))
@@ -342,7 +352,36 @@ window-system
    '(font-lock-variable-name-face ((t (:foreground "lightgreen"))))
    )
   )
-
+;
+; yet another color theme
+; This one looks good with the bitstream vera fonts from GNOME
+;
+(defun theme-daring-fireball()
+  "A color scheme based on DaringFireball.net"
+  (interactive "")
+  (setq default-frame-alist      
+        '((foreground-color . "white")    
+          (background-color . "#4a525a")
+          ))
+  (custom-set-faces
+   '(default   ((t (:background "#4a525a" :foreground "white" ))))
+   '(cursor    ((t (:background "#aaaaaa"   :foreground "#4a525a" ))))
+   '(highlight ((t (:background "#aaaaaa"  :foreground "black"))))
+   '(region    ((t (:background "#aaaaaa"   :foreground "black"))))
+   '(font-lock-comment-face ((t (:italic t :foreground "lavender"))))
+   '(font-lock-function-name-face ((t (:bold t :foreground "cyan"))))
+   '(font-lock-builtin-face ((t (:bold t :foreground "aquamarine"))))
+   '(font-lock-string-face ((t (:foreground "lemonchiffon"))))
+   '(font-lock-constant-face ((t (:bold t :foreground "lavender"))))
+   '(font-lock-keyword-face ((t (:bold t :foreground "aliceblue"))))
+   '(font-lock-type-face ((t (:bold t :foreground "palegreen"))))
+   '(font-lock-variable-name-face ((t (:foreground "yellow"))))
+;   '(margin-face ((t (:inverse-video t ))))
+   '(cperl-array-face ((t (:foreground "yellow"))))
+   '(cperl-hash-face ((t (:foreground "wheat"))))
+   ;'(modeline ((t (:background "#606060" :foreground "white" :overline t :underline t)))) 
+	)
+  )
 (defun theme-grizzle()
   "A subtle theme based on Aperture"
   (interactive "")
@@ -367,7 +406,7 @@ window-system
    '(cperl-array-face ((t (:foreground "navy"))))
    '(cperl-hash-face ((t (:foreground "navy"))))
    '(cperl-nonoverridable-face ((t (:foreground "navy"))))
-   '(modeline ((t (:background "white" :foreground "black" )))) 
+   ;'(modeline ((t (:background "white" :foreground "black" )))) 
    )
 )
 
@@ -397,25 +436,53 @@ window-system
 ;   '(margin-face ((t (:inverse-video t ))))
    '(cperl-array-face ((t (:foreground "yellow"))))
    '(cperl-hash-face ((t (:foreground "wheat"))))
-   '(modeline ((t (:background "#606060" :foreground "white" :overline t :underline t)))) 
+   ;'(modeline ((t (:background "#606060" :foreground "white" :overline t :underline t)))) 
    )
   )
+
+(defun theme-turboc()
+  "A simple color scheme"
+  (interactive "")
+  (setq default-frame-alist      
+        '((foreground-color . "#fcfc54")    
+          (background-color . "#0000a8")
+          ))
+  (set-cursor-color "midnightblue")
+  (set-mouse-color "midnightblue")
+  (custom-set-faces
+   '(default   ((t (:background "#0000a8" :foreground "#fcfc54" ))))
+   '(cursor    ((t (:background "#fcfc54"   :foreground "#0000a8" ))))
+   '(highlight ((t (:background "yellow"  :foreground "black"))))
+   '(region    ((t (:background "brown"   :foreground "white"))))
+   '(modeline  ((t (:background "#c0c0c0" :foreground "black"))))
+   '(font-lock-comment-face ((t (:italic t :foreground "lavender"))))
+   '(font-lock-function-name-face ((t (:bold t :foreground "cyan"))))
+   '(font-lock-builtin-face ((t (:bold t :foreground "aquamarine"))))
+   '(font-lock-string-face ((t (:foreground "lemonchiffon"))))
+   '(font-lock-constant-face ((t (:bold t :foreground "lavender"))))
+   '(font-lock-keyword-face ((t (:bold t :foreground "aliceblue"))))
+   '(font-lock-type-face ((t (:bold t :foreground "palegreen"))))
+   '(font-lock-variable-name-face ((t (:foreground "yellow"))))
+   )
+  )
+
 ;
 ; uncomment whichever theme I currently favor
 ;
 ;(katester)
 ;(matrix)
-;(basic)
+(theme-basic)
 ;(grizzle)
 
 
-
+; wph 20120808 - css mode comes with emacs 24.1
 ;
 ; wph 20030730 added css-mode
 ;
-(autoload 'css-mode "css-mode")
-(setq auto-mode-alist
-      (cons '("\\.css\\'" . css-mode) auto-mode-alist))
+;(autoload 'css-mode "css-mode")
+;(setq auto-mode-alist
+;      (cons '("\\.css\\'" . css-mode) auto-mode-alist))
+
 ;
 ; use cperl-mode
 ;
@@ -512,7 +579,7 @@ window-system
 ;; note: this doesn't work - 
 ;;        fontlock throttles the 'post-command-hook variable
 ;;
-(defun jsp-movement-hook ()
+(defun movement-hook ()
   (let ((command-name (symbol-name this-command)))
     (if (member command-name '("previous-line" 
                                "next-line" 
@@ -562,10 +629,11 @@ window-system
 (load-library "cc-mode")
 (define-key java-mode-map "\C-t\C-c" 'try-catch-skel)
 
+
 (setq html-mode-hook
       '(lambda ()
          (define-key sgml-mode-map "\C-c\C-q"  'jsp-indent-java)
-         ;;(add-hook 'post-command-hook 'jsp-movement-hook)
+         ;;(add-hook 'post-command-hook 'movement-hook)
          ))
 
 ;---------------------------------------
@@ -577,34 +645,111 @@ window-system
 ; another location automatically.
 ;--------------------------------------
 (defvar aka-list (make-hash-table :test 'equal))
+
 (defun aka-hook ()
-  (maphash 
-   (lambda (source targets) 
-     ;; if the current file matches an entry in the aka-list lookup table...
-     (if (string-match source buffer-file-name) 
-         ;; loop over each target file/dir
-         (while targets 
-           (setq target (car targets))  ;; current target
-           (setq targets (cdr targets)) ;; ensure loop ends
-           (setq mirrored 
-                 (concat target
-                         (mapconcat 'identity 
-                                    (split-string buffer-file-name source) "")))
-           (message (concat "duplicating " buffer-file-name " to " mirrored))
-           ;; need to retain buffer file name 
-           (setq old buffer-file-name)
-           (copy-file buffer-file-name mirrored 't)
-           (setq buffer-file-name old)
-           );; end targets loop
-       ) ;; end if match
-     );; end lambda
-   aka-list)
+  (maphash (lambda (key value) 
+             (if (string-match key buffer-file-name)
+                 ((lambda (key value)
+                    (while value
+                      (setq my-element (car value))
+                      (setq value (cdr value))
+                      (setq mirrored (concat my-element
+                                             (mapconcat 'identity 
+                                                        (split-string buffer-file-name key) "")))
+                      (message (concat "duplicating " buffer-file-name " to " mirrored))
+                      (setq old buffer-file-name)
+                      (copy-file buffer-file-name mirrored 't)
+                      (setq buffer-file-name old)
+                      )
+                    ) key value)
+               
+               )
+             )
+           aka-list)
   )
 (add-hook 'after-save-hook 'aka-hook)
+;
 ; To add a new hard link (works with directories or files)
 ;
-; (puthash "c:/oldDirectory" '("c:/newDirectory") aka-list)
-; (puthash "c:/oldFile" '("c:/newFile") aka-list)
+; (puthash "c:/oldDirectory" "c:/newDirectory" aka-list)
+; (puthash "c:/oldFile" "c:/newFile" aka-list)
+(puthash "c:/iemfsaworkspace/Site Development/Dashboards/jslib/" '("C:/Documents and Settings/Administrator/Local Settings/Application Data/BigFix/Enterprise Console/tpmdev23.hursley.ibm.com/besadmin/Sites/Server Automation Engine/") aka-list)
+;------------------------------------------------------------------------------
+;
+; BLOG related stuff 
+;
+;------------------------------------------------------------------------------
+; CTRL-C CTRL-B n creates a new blog entry
+(defun blog-new-post (topic)
+  "create a new post for weblog"
+  (interactive "sPlease enter topic name: ")
+; open the file
+  (find-file (concat "~/website/crocus/common/etc/posts/" 
+                     topic "."
+                     (if (y-or-n-p "hours ? ")
+                         (format-time-string "%Y%m%d%H%M")
+                       (format-time-string "%Y%m%d"))))
+; set cursor so I can start typing the title
+; <!--*->  * marks where cursor will be
+  (insert "<!---->\n")
+  (beginning-of-buffer)    
+  (forward-char 4)         
+  )
+
+; select a region
+; type CTRL-C CTRL-B p
+; region becomes preface
+(define-skeleton blog-preface
+  "markup text as preface"
+  nil
+  "<div class=\"preface\">" _ "<br/></div>")
+
+; select a region
+; type CTRL-C CTRL-B u
+; region becomes update
+(define-skeleton blog-update
+  "markup text as update"
+  nil
+  "<div class=\"update\">" (format-time-string "%Y/%m/%d %H:%M")  _ "</div>")
+
+; select a region
+; type CTRL-C CTRL-B b
+; region becomes the blog entry blurb that appears on index pages
+(define-skeleton blog-blurb
+  "The region is marked up as the blurb "
+  nil
+  "\n<!-- blurb -->\n" _ "\n<!-- /blurb -->")
+
+; Use standard right-aligned images
+; works on existing selection
+(define-skeleton blog-icon
+  "The icon or image that appears on right of page"
+  nil
+  "<img src=\""
+  _ 
+  "\"/>")
+(global-set-key "\C-c\C-bn" 'blog-new-post)
+(global-set-key "\C-c\C-bp" 'blog-preface)
+(global-set-key "\C-c\C-bb" 'blog-blurb)
+(global-set-key "\C-c\C-bi" 'blog-icon)
+(global-set-key "\C-c\C-bu" 'blog-update)
+
+(setq cperl-invalid-face '((t ())))
+
+;
+; website stuff for digital-crocus
+;
+(puthash "c:/home/website/crocus/common" 
+         '("c:/home/website/crocus/filmpundit.com" 
+           "c:/home/website/crocus/xanadb.com") aka-list)
+
+
+;
+; make sure my local _emacs and public _emacs are always
+; in sync
+;;(puthash "c:/home/_emacs"
+;;       '("/www.xanadb.com:common/_emacs") aka-list)
+;;(remhash "c:/home/_emacs" aka-list)
 
 
 (put 'upcase-region 'disabled nil)
@@ -705,34 +850,55 @@ window-system
    '(font-lock-variable-name-face ((t (:foreground "yellow"))))
    '(cperl-array-face ((t (:foreground "yellow"))))
    '(cperl-hash-face ((t (:foreground "yellow"))))
-   '(modeline ((t (:background "#808080" :foreground "white" )))) 
+   ;'(modeline ((t (:background "#808080" :foreground "white" )))) 
    )
   )
 
 
 (theme-lcd-basic)
 
+;
+; jabber 
+;
+;(add-to-list 'load-path (expand-file-name "~/emacs-jabber-0.7.1"))
+;(require 'jabber)
+
+;
+; Work-specific stuff starts here...
+;
+
+
+;(load "work")
 (require 'ange-ftp)
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#303030" :foreground "white" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 90 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:background "#303030" :foreground "white" :family "DejaVu Sans Mono" :foundry "outline" :slant normal :weight normal :height 78 :width normal))))
  '(cperl-array-face ((t (:foreground "yellow"))))
- '(cperl-hash-face ((t (:foreground "yellow"))))
+ '(cperl-hash-face ((t (:foreground "wheat"))))
  '(cursor ((t (:background "white" :foreground "#303030"))))
- '(font-lock-builtin-face ((t (:foreground "cyan"))))
+ '(font-lock-builtin-face ((t (:bold t :foreground "aquamarine"))))
  '(font-lock-comment-face ((t (:italic t :foreground "lavender"))))
- '(font-lock-constant-face ((t (:foreground "lavender"))))
- '(font-lock-function-name-face ((t (:foreground "green"))))
- '(font-lock-keyword-face ((t (:bold t))))
+ '(font-lock-constant-face ((t (:bold t :foreground "lavender"))))
+ '(font-lock-function-name-face ((t (:bold t :foreground "cyan"))))
+ '(font-lock-keyword-face ((t (:bold t :foreground "aliceblue"))))
  '(font-lock-string-face ((t (:foreground "lemonchiffon"))))
- '(font-lock-type-face ((t (:foreground "pale green"))))
+ '(font-lock-type-face ((t (:bold t :foreground "palegreen"))))
  '(font-lock-variable-name-face ((t (:foreground "yellow"))))
  '(highlight ((t (:background "yellow" :foreground "black"))))
- '(mode-line ((t (:background "#808080" :foreground "white"))))
- '(region ((t (:background "steel blue" :foreground "white")))))
+ '(mode-line ((t (:background "#606060" :foreground "white" :overline t :underline t))))
+ '(region ((t (:background "brown" :foreground "white"))))
+ '(speedbar-directory-face ((t (:foreground "light blue" :slant normal :weight normal :height 78 :width normal :foundry "outline" :family "DejaVu Sans Mono")))))
+
+;; 
+;; Not needed since Emacs 24.1
+;;
+;(autoload 'js2-mode "js2" nil t)
+;(autoload 'js2-mode "c:/shared/js2.el" "Major mode for editing js files" t)
+(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+;(add-to-list 'auto-mode-alist '("\\.js$" . java-mode))
 
 ; 
 ; TinyTemplate template files
@@ -762,10 +928,18 @@ window-system
         (message "%s" (count-matches "\\sw+"))
 		  )))
 
-;; untabify on save
-(setq-default indent-tabs-mode nil)
- ;; if indent-tabs-mode is off, untabify before saving
- (add-hook 'write-file-hooks 
-          (lambda () (if (not indent-tabs-mode)
-                         (untabify (point-min) (point-max)))))
 
+;; wph 20131114 adding perforce support
+(require 'vc-p4)
+(require 'flymake-jslint)
+(add-hook 'js-mode-hook 'flymake-jslint-load)
+;; wph 20131125 set indent level to 2 
+(add-hook 'js-mode-hook '(lambda ()
+									(setq js-indent-level 2)
+))
+;; wph 20140124 js2 indentation
+
+(add-hook 'js2-mode-hook 'flymake-jslint-load)
+(add-hook 'js2-mode-hook '(lambda ()
+                            (setq indent-tabs-mode nil)
+))
